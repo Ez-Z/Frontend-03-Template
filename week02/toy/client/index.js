@@ -22,11 +22,7 @@ class Request {
   }
 
   toString() {
-    return `${this.method} ${this.path} HTTP/1.1\r\n
-    ${Object.keys(this.headers).map(key => `${key}: ${this.headers[key]}`).join('\r\n')}\r\n
-    \r\n
-    ${this.bodyText}
-    `
+    return `${this.method} ${this.path} HTTP/1.1\r\n${Object.keys(this.headers).map(key => `${key}: ${this.headers[key]}`).join('\r\n')}\r\n\r\n${this.bodyText}`
   }
 
   send(connection) {
@@ -37,20 +33,20 @@ class Request {
       } else {
         connection = net.createConnection({
           host: this.host,
-          port: this.port,
+          port: this.port
         }, () => {
           connection.write(this.toString());
         })
       }
-
       connection.on('data', (data) => {
+        console.log('data', data.toString());
         parser.receive(data.toString());
         if (parser.isFinished) {
           resolve(parser.response);
-          connection.end();
-        }
-      });
 
+        }
+        connection.end();
+      });
       connection.on('error', (err) => {
         reject(err);
         connection.end();
@@ -75,7 +71,7 @@ class TrunkedBodyParser {
 
   receiveChar(char) {
     if (this.current === this.WAITING_LENGTH) {
-      if(char === '\r') {
+      if (char === '\r') {
         if (this.length === 0) {
           this.isFinished = true;
         }
@@ -121,10 +117,11 @@ class ResponseParser {
     this.statusLine = "";
     this.headers = {};
     this.headerName = "";
+    this.headerValue = "";
     this.bodyParser = null;
   }
 
-  get isFinished () {
+  get isFinished() {
     return this.bodyParser && this.bodyParser.isFinished;
   }
 
@@ -156,12 +153,12 @@ class ResponseParser {
         this.current = this.WAITING_HEADER_NAME;
       }
     } else if (this.current === this.WAITING_HEADER_NAME) {
-      if (this.char === ":") {
+      if (char === ':') {
         this.current = this.WAITING_HEADER_SPACE;
       } else if (char === '\r') {
         this.current = this.WAITING_HEADER_BLOCK_END;
-        if (this.headers["Transfer-Encoding"] === 'chunked') {
-          this.bodyParser = new TrunkedBodyParser);
+        if (this.headers['Transfer-Encoding'] === 'chunked') {
+          this.bodyParser = new TrunkedBodyParser();
         }
       } else {
         this.headerName += char;
@@ -182,19 +179,19 @@ class ResponseParser {
     } else if (this.current === this.WAITING_HEADER_LINE_END) {
       if (char === '\n') {
         this.current = this.WAITING_HEADER_NAME;
-      } else if (this.current === this.WAITING_HEADER_BLOCK_END) {
-        if (char === '\n') {
-          this.current = this.WAITING_BODY;
-        }
-      } else if (this.current === this.WAITING_BODY) {
-        this.bodyParser.receiveChar(char);
       }
+    } else if (this.current === this.WAITING_HEADER_BLOCK_END) {
+      if (char === '\n') {
+        this.current = this.WAITING_BODY;
+      }
+    } else if (this.current === this.WAITING_BODY) {
+      this.bodyParser.receiveChar(char);
     }
   }
 }
 
 
-void (async function (params) {
+void async function (params) {
   let request = new Request({
     method: 'POST',
     host: '127.0.0.1', // ip
@@ -211,4 +208,4 @@ void (async function (params) {
   let response = await request.send();
 
   console.log('res', response);
-})();
+}();
