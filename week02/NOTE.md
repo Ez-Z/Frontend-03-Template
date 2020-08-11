@@ -2,6 +2,35 @@
 
 部分笔记见图片
 
+## 常用状态码
+200 OK 请求已成功，请求所希望的响应头或数据体将随此响应返回。出现此状态码是表示正常状态。
+
+
+301 Moved Permanently 被请求的资源已永久移动到新位置
+
+302 Move Temporarily 请求的资源临时从不同的 URI响应请求
+
+304 Not Modified 带条件的 GET 请求且该请求已被允许，而内容（自上次访问以来或者根据请求的条件）并没有改变，则服务器应当返回这个状态码
+
+
+400 Bad Request 
+
+401 Unauthorized
+
+403 Forbidden
+
+404 Not Found
+
+405 Method Not Allowed
+
+
+500 Internal Server Error
+
+502 Bad Gateway
+
+## 状态机
+状态机是一种控制规则，可以用来描述机器。也是图灵机的基础。
+
 ## 有限状态机
 - 每个状态都是一个机器
     - 在每个机器里，我们可以计算、存储、输出……
