@@ -3,9 +3,9 @@ function getStyle(elm) {
   if (!elm.style) elm.style = {};
   
   for (let prop in elm.computedStyle) {
-    let p = elm.computedStyle.value;
-    elm.style[prop] = elm.computedStyle[prop].value;
-    // elm.style[prop] = elm.computedStyle[prop].value.value;
+    // let p = elm.computedStyle.value;
+    // elm.style[prop] = elm.computedStyle[prop].value;
+    elm.style[prop] = elm.computedStyle[prop].value.value;
 
     if (elm.style[prop].toString().match(/px$/)) {
       elm.style[prop] = parseInt(elm.style[prop])
