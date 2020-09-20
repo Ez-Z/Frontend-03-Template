@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: green;
+            display: inline-block;
+            border: 1px solid white;
+            vertical-align: middle;
+            line-height: 100px;
+            font-size: 50px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="board"></div>
+    <script>
+        let pattern = [
+            0, 0, 0,
+            0, 0, 0,
+            0, 0, 0,
+        ];
+
+        let color = 1;
+
+        function show() {
+            let board = document.getElementById('board');
+
+            board.innerHTML = ''; // 重画棋盘前先清空一下
+
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    let cell = document.createElement("div");
+                    cell.classList.add('cell');
+                    cell.innerText =
+                        pattern[i * 3 + j] === 2 ? 'X' :
+                        pattern[i * 3 + j] === 1 ? 'O' : '';
+                    cell.addEventListener('click', () => userMove(i, j));
+                    board.appendChild(cell);
+                }
+                board.appendChild(document.createElement('br'));
+            }
+        }
+
+        function userMove(x, y) {
+            pattern[x * 3 + y] = color;
+            if (check(pattern, color)) {
+                alert(color === 2 ? 'X is winner !' : 'O is winner')
+            }
+            color = 3 - color;
+            show();
+            computerMove(); // 电脑走
+        }
+
+        function computerMove() {
+            let choice = bestChoice(pattern, color);
+            if (choice.point) {
+                console.log('choice.point', choice.point);
+                console.log('choice.point[0] * 3 + choice.point[1]', choice.point[0] * 3 + choice.point[1]);
+                pattern[choice.point[0] * 3 + choice.point[1]] =
+                    color; // point 是位置，这里将二维的坐标转成一维的值，以左上角为起点，横是 y，纵是 x。可以看上两步打印的 log
+            }
+            if (check(pattern, color)) {
+                alert(color === 2 ? 'X is winner!' : 'O is winner!')
+            }
+            color = 3 - color;
+            show();
+        }
+
+        function check(pattern, color) {
+            // 三行
+            for (let i = 0; i < 3; i++) {
+                let win = true;
+                for (let j = 0; j < 3; j++) {
+                    if (pattern[i * 3 + j] !== color) {
+                        win = false;
+                    }
+                }
+                if (win) {
+                    return true;
+                }
+            }
+
+            // 三列
+            for (let i = 0; i < 3; i++) {
+                let win = true;
+                for (let j = 0; j < 3; j++) {
+                    if (pattern[j * 3 + i] !== color) {
+                        win = false;
+                    }
+                }
+                if (win) {
+                    return true;
+                }
+            }
+
+            // 斜向一，横纵坐标相等，如 00 11 22
+            // 小技巧：使用let时加了花括号,让代码编程局部
+            {
+                let win = true;
+                for (let i = 0; i < 3; i++) {
+                    if (pattern[i * 3 + i] !== color) {
+                        win = false;
+                    }
+                }
+                if (win) {
+                    return true;
+                }
+            }
+
+            // 斜向二：横纵坐标相反，如 02 11 20
+            {
+                let win = true;
+                for (let i = 0; i < 3; i++) {
+                    if (pattern[i * 3 + 2 - i] !== color) {
+                        win = false;
+                    }
+                }
+                if (win) {
+                    return true;
+                }
+            }
+            return false;
+
+        }
+
+        function clone(pattern) {
+            return Object.create(pattern); // 节省内存空间
+        }
+
+        function willWin(pattern, color) {
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    if (pattern[i * 3 + j]) {
+                        continue;
+                    }
+                    let tmp = clone(pattern);
+                    tmp[i * 3 + j] = color; // 重要，尝试走这一步，看能不能赢，不行的话，最终要把所有空节点走完。
+                    if (check(tmp, color)) {
+                        return [i, j];
+                    }
+                }
+            }
+            return null;
+        }
+
+        function bestChoice(pattern, color) {
+            let point = willWin(pattern, color);
+            if (point) { // 这里不是 ===，而是 =
+                return {
+                    point: point, // 位置
+                    result: 1 // 结果：输，赢，平；-1， + 1，0。
+                }
+            }
+            let result = -1;
+            outer: for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    if (pattern[i * 3 + j] !== 0) { // 只检查空的地方，所以不空的话就 continue
+                        continue;
+                    }
+                    let tmp = clone(pattern);
+                    tmp[i * 3 + j] = color; // 模拟走棋，这里先走一步，接下来对方会执行 bestChoice() 来找出最佳/最差
+                    let opp = bestChoice(tmp, 3 - color); // 3 - color 表示对方，这里是对方策略的结果
+
+                    // opp 是对方最佳选择，-opp 则是对方的最差选择，即是我方最佳选择
+                    if (-opp.result >= result) { // - opp
+                        point = [i, j];
+                        result = -opp.result;
+                    }
+
+                    if (result === 1) {
+                        break outer; // break 掉两层循环，即，result 是 1 的话，退出两层循环
+                    }
+                }
+            }
+            return {
+                point: point,
+                result: point ? result : 0 // 平是 0
+            }
+
+        }
+        show();
+    </script>
+</body>
+
+</html>
