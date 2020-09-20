@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Light</title>
+    <style>
+        .light {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: gray;
+            display: inline-block;
+            margin-right: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="green" class="light"></div>
+    <div id="yellow" class="light"></div>
+    <div id="red" class="light"></div>
+    <button id="next">next</button>
+    <script>
+        // 绿灯10秒、黄灯2秒、红灯5秒
+        const light = {
+            green: document.querySelector('#green'),
+            yellow: document.querySelector('#yellow'),
+            red: document.querySelector('#red'),
+        };
+
+        function render(color) {
+            light.green.style.background = 'gray';
+            light.yellow.style.background = 'gray';
+            light.red.style.background = 'gray';
+
+            light[color].style.background = color;
+        }
+
+        function sleep(t) {
+            return new Promise((resolve, reject) => {
+                setTimeout(resolve, t);
+            })
+        }
+
+        function happen(element, eventName) {
+            return new Promise((resolve, reject) => {
+                element.addEventListener(eventName, resolve);
+            })
+        }
+        const next = document.querySelector('#next');
+        async function go() {
+            render('green');
+            await happen(next, 'click');
+            render('yellow');
+            await happen(next, 'click');
+            render('red');
+            await happen(next, 'click');
+            go();
+        }
+        go();
+    </script>
+</body>
+
+</html>
