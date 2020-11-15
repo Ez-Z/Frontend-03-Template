@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <body oncontextmenu="event.preventDefault();"></body>
+  <script type="module">
+    import { enableGesture } from './gesture.js';
+
+    document.documentElement.addEventListener('tap', event => {
+        console.log('tap');
+    });
+
+    document.documentElement.addEventListener('flick', event => {
+        console.log('flick');
+    });
+
+    enableGesture(document.documentElement);
+</script>
+</body>
+
+</html>
