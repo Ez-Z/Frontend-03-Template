@@ -4,9 +4,14 @@ let archiver = require('archiver')
 let child_process = require('child_process');
 let querystring = require('querystring');
 
+// auth路由： 接受code，用code+cliend_id+cliend_secrent换取token
+// 用token后去用户信息，检查权限
+// 接受发布
 
-// 1. 请求Github
+// 请求Github
 child_process.exec(`start chrome https://github.com/login/oauth/authorize?client_id=f1892c96499b3b9b2fd0`);
+
+// code 7de7bc5db10e85900081
 
 // 获取token
 http.createServer(function (request, response) {
