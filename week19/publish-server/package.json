@@ -1,0 +1,16 @@
+{
+  "name": "publish-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node ./server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publish": "scp -r -P 8022 ./* zsd920514@127.0.0.1:/home/zsd920514/publish-server"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "unzipper": "^0.10.11"
+  }
+}
