@@ -3,8 +3,8 @@
 # 实现一个线上web服务
 
 ## 初始化server
-- 安装 Oracle VM VirtualBox https://www.virtualbox.org/
-- 下载 Ubuntu 20.04.1 LTS (Focal Fossa) https://releases.ubuntu.com/20.04/
+- 安装 [Oracle VM VirtualBox](https://www.virtualbox.org/)
+- 下载 [Ubuntu 20.04.1 LTS (Focal Fossa)](https://releases.ubuntu.com/20.04/)
 - 新建node server
 - 使用阿里云服务 http://mirrors.aliyun.com/ubuntu
 - 选择安装openssh服务
